@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 /// User position information
@@ -8,25 +9,53 @@ pub struct Position {
     pub asset: String,
     #[serde(rename = "conditionId")]
     pub condition_id: String,
-    pub size: f64,
-    #[serde(rename = "avgPrice")]
-    pub avg_price: f64,
-    #[serde(rename = "initialValue")]
-    pub initial_value: f64,
-    #[serde(rename = "currentValue")]
-    pub current_value: f64,
-    #[serde(rename = "cashPnl")]
-    pub cash_pnl: f64,
-    #[serde(rename = "percentPnl")]
-    pub percent_pnl: f64,
-    #[serde(rename = "totalBought")]
-    pub total_bought: f64,
-    #[serde(rename = "realizedPnl")]
-    pub realized_pnl: f64,
-    #[serde(rename = "percentRealizedPnl")]
-    pub percent_realized_pnl: f64,
-    #[serde(rename = "curPrice")]
-    pub cur_price: f64,
+    #[serde(deserialize_with = "super::serde_helpers::deserialize_decimal")]
+    pub size: Decimal,
+    #[serde(
+        rename = "avgPrice",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub avg_price: Decimal,
+    #[serde(
+        rename = "initialValue",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub initial_value: Decimal,
+    #[serde(
+        rename = "currentValue",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub current_value: Decimal,
+    #[serde(
+        rename = "cashPnl",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub cash_pnl: Decimal,
+    #[serde(
+        rename = "percentPnl",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub percent_pnl: Decimal,
+    #[serde(
+        rename = "totalBought",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub total_bought: Decimal,
+    #[serde(
+        rename = "realizedPnl",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub realized_pnl: Decimal,
+    #[serde(
+        rename = "percentRealizedPnl",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub percent_realized_pnl: Decimal,
+    #[serde(
+        rename = "curPrice",
+        deserialize_with = "super::serde_helpers::deserialize_decimal"
+    )]
+    pub cur_price: Decimal,
     pub redeemable: bool,
     pub mergeable: bool,
     pub title: String,
@@ -49,7 +78,8 @@ pub struct Position {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PositionValue {
     pub user: String,
-    pub value: f64,
+    #[serde(deserialize_with = "super::serde_helpers::deserialize_decimal")]
+    pub value: Decimal,
 }
 
 /// Parameters for querying trades

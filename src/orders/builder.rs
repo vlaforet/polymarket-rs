@@ -94,6 +94,7 @@ impl OrderBuilder {
     /// Calculate order amounts for a market order
     fn get_market_order_amounts(
         &self,
+        side: Side,
         amount: Decimal,
         price: Decimal,
         round_config: &RoundConfig,
@@ -101,7 +102,10 @@ impl OrderBuilder {
         let raw_maker_amt = amount.round_dp_with_strategy(round_config.size, ToZero);
         let raw_price = price.round_dp_with_strategy(round_config.price, MidpointTowardZero);
 
-        let raw_taker_amt = raw_maker_amt / raw_price;
+        let raw_taker_amt = match side {
+            Side::Buy => raw_maker_amt / raw_price,
+            Side::Sell => raw_maker_amt * raw_price,
+        };
 
         let raw_taker_amt = fix_amount_rounding(raw_taker_amt, round_config);
 
@@ -135,7 +139,7 @@ impl OrderBuilder {
             .ok_or_else(|| Error::InvalidParameter(format!("Invalid tick_size: {}", tick_size)))?;
 
         let (maker_amount, taker_amount) =
-            self.get_market_order_amounts(order_args.amount, price, round_config);
+            self.get_market_order_amounts(order_args.side, order_args.amount, price, round_config);
 
         let contract_config = get_contract_config(chain_id, neg_risk)?;
 

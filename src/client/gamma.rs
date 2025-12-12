@@ -78,7 +78,7 @@ impl GammaClient {
     ///
     /// let markets = client.get_markets(Some(params)).await?;
     /// for market in markets {
-    ///     if let Some(q) = &market.question {
+    ///     if let q = &market.question {
     ///         println!("{}: {}", market.id, q);
     ///     }
     /// }
@@ -112,7 +112,7 @@ impl GammaClient {
     /// # async fn main() -> polymarket_rs::Result<()> {
     /// let client = GammaClient::new("https://gamma-api.polymarket.com");
     /// let market = client.get_market("0x123...").await?;
-    /// if let Some(q) = &market.question {
+    /// if let q = &market.question {
     ///     println!("Market: {}", q);
     /// }
     /// # Ok(())

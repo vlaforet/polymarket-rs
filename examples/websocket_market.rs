@@ -1,17 +1,41 @@
 use futures_util::StreamExt;
+use polymarket_rs::request::GammaMarketParams;
 use polymarket_rs::types::WsEvent;
 use polymarket_rs::websocket::{MarketWsClient, ReconnectConfig, ReconnectingStream};
+use polymarket_rs::GammaClient;
 use std::time::Duration;
+
+async fn get_market_token_id() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let client = GammaClient::new("https://gamma-api.polymarket.com");
+
+    let params = GammaMarketParams::new()
+        .with_active(true)
+        .with_closed(false)
+        .with_limit(5);
+
+    match client.get_markets(Some(params)).await {
+        Ok(markets) => Ok(markets
+            .iter()
+            .map(|m| {
+                let token_ids: Vec<String> =
+                    serde_json::from_str(&m.clob_token_ids.as_ref().unwrap()).unwrap_or_default();
+                token_ids
+            })
+            .flatten()
+            .collect()),
+        Err(e) => {
+            println!("Get markets error: {}", e);
+            Err(Box::new(e))
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = MarketWsClient::new();
 
     // Token IDs to subscribe to
-    let token_ids = vec![
-        // "Yes" token for "Fed decreases interest rates by 25 bps after December 2025 meeting?"
-        "87769991026114894163580777793845523168226980076553814689875238288185044414090".to_string(),
-    ];
+    let token_ids = get_market_token_id().await?;
 
     println!("Connecting to CLOB WebSocket with auto-reconnect...");
     println!("Subscribing to {} token(s)", token_ids.len());

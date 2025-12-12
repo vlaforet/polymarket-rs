@@ -10,23 +10,28 @@ use super::Side;
 
 /// Websocket event from the market stream
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "event_type")]
 pub enum WsEvent {
     /// Emitted When: First subscribed to a market / when there is a trade that affects the book
+    #[serde(rename = "book")]
     Book(BookEvent),
+
     /// Emitted When: A new order is placed / an order is cancelled
+    #[serde(rename = "price_change")]
     PriceChange(PriceChangeEvent),
+
     /// Emitted When: When a maker and taker order is matched creating a trade event.
+    #[serde(rename = "last_trade_price")]
     LastTradePrice(LastTradePriceEvent),
+
     /// Emitted When: The minimum tick size of the market changes. This happens when the book’s price reaches the limits: price > 0.96 or price < 0.04
+    #[serde(rename = "tick_size_change")]
     TickSizeChange(TickSizeChangeEvent),
 }
 
 /// Full order book snapshot event
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BookEvent {
-    /// Event type discriminator (always "book")
-    pub event_type: String,
     /// Market ID
     pub market: String,
     /// Token/Asset ID
@@ -47,8 +52,6 @@ pub struct BookEvent {
 /// Incremental order book update event
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceChangeEvent {
-    /// Event type discriminator (always "price_change")
-    pub event_type: String,
     /// Market ID
     pub market: String,
     /// Timestamp (optional)
@@ -79,8 +82,6 @@ pub struct PriceChange {
 /// Last trade price event
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LastTradePriceEvent {
-    /// Event type discriminator (always "last_trade_price")
-    pub event_type: String,
     /// Market ID
     pub market: String,
     /// Token/Asset ID
@@ -105,8 +106,6 @@ pub struct LastTradePriceEvent {
 /// Tick size change event
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TickSizeChangeEvent {
-    /// Event type discriminator (always "tick_size_change")
-    pub event_type: String,
     /// Token/Asset ID
     pub asset_id: String,
     /// Market ID
@@ -127,7 +126,7 @@ pub struct TickSizeChangeEvent {
 
 /// Websocket event from the authenticated user stream
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "event_type")]
 pub enum UserWsEvent {
     /// Trade execution event
     Trade(TradeEvent),
@@ -138,8 +137,6 @@ pub enum UserWsEvent {
 /// Trade execution event (when an order is matched)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TradeEvent {
-    /// Event type discriminator (always "trade")
-    pub event_type: String,
     /// Trade ID
     pub id: String,
     /// Market ID
@@ -194,8 +191,6 @@ pub struct MakerOrder {
 /// Order status update event
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderEvent {
-    /// Event type discriminator (always "order")
-    pub event_type: String,
     /// Order ID
     pub id: String,
     /// Owner ID

@@ -129,8 +129,10 @@ pub struct TickSizeChangeEvent {
 #[serde(tag = "event_type")]
 pub enum UserWsEvent {
     /// Trade execution event
+    #[serde(rename = "trade")]
     Trade(TradeEvent),
     /// Order status update event
+    #[serde(rename = "order")]
     Order(OrderEvent),
 }
 
